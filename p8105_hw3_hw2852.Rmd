@@ -20,17 +20,20 @@ library(p8105.datasets)
 data("instacart")
 ```
 
-## Description of `Instacart` Data Set
+## 1.1 Description of `Instacart` Data 
 
-## Aisles
+
+## 1.2 Analysis of `Instacart` Data
+
+### Aisles
 
 We can enumerate the number of aisles by applying the `group_by` function to identify the number of unique `aisle_id` variable values. The number of rows generated in the output would be the number of aisles in the data set. Building upon the results generated from the `group_by` function, we may determine the aisles from which the most items were ordered. This process involves generating a summary of the number of times each `aisle_id` appears in these data, then arranging the aisles in decreasing order of the number of times it appears. 
 
 ```{r}
 instacart %>%
   group_by(aisle_id) %>% 
-  summarize(count = n()) %>% 
-  arrange(desc(count))
+  summarize(items_ordered = n()) %>% 
+  arrange(desc(items_ordered))
 ```
 
 There are __134 aisles__ in the `Instacart` data set. Of the 134 aisles, the following are the aisles from which the most items are ordered:
@@ -42,3 +45,16 @@ __24__         150,473
 __123__        78,493
 __120__        55,240
 __21__         41,699
+
+### Plotting Aisle vs. Items Ordered
+
+```{r}
+instacart %>% 
+  group_by(aisle_id) %>% 
+  mutate(items_ordered = n()) %>% 
+  filter(items_ordered > 10000) %>% 
+  ggplot(aes(x = aisle_id)) + 
+  geom_histogram(color = "black", fill = "lightblue") + 
+  labs(title = "Plot of Aisle by Numbers of Items Sold", x = "Aisle ID", y = "Number of Items Ordered")
+```
+
