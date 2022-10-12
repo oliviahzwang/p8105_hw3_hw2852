@@ -1,0 +1,21 @@
+---
+title: "P8105 Data Science I Homework 3"
+author: Olivia Wang (hw2852)
+output: github_document
+date: "2022-10-15"
+---
+
+In preparation for the problems below, we will load the following libraries: 
+
+```{r load_libraries}
+library(tidyverse)
+```
+
+# Problem 1
+
+This problem uses the `Instacart` data. This data set will be loaded through the `p805.datasets` library. 
+
+```{r}
+library(p8105.datasets)
+data("instacart")
+```
