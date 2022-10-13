@@ -34,7 +34,7 @@ We can enumerate the number of aisles by applying the `group_by` function to ide
 ```{r}
 instacart %>%
   group_by(aisle_id) %>% 
-  summarize(items_ordered = n()) %>% 
+  summarise(items_ordered = n()) %>% 
   arrange(desc(items_ordered))
 ```
 
@@ -81,5 +81,15 @@ accelerometer_data =
 
 ***Data description 
 
+## 2.2 Total Daily Activity
+
+Using the tidied accelerometer data generated in Part 2.1, we can aggregate across daily minutes to create a total activity variable for each of the 35 days of observation. We will first group the entries by `day_id`, then apply the `summarise` function to generate a new variable taking on the value of the sum of the activity counts associated with the specific `day_id`. 
+
+```{r}
+accelerometer_data %>% 
+  group_by(day_id) %>% 
+  summarise(total_daily_activity = sum(activity_count)) %>% 
+  print(n = 35)
+```
 
 
