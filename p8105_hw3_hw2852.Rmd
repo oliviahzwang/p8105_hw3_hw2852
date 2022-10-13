@@ -94,7 +94,9 @@ accelerometer_data %>%
 
 *** Data description
 
-## 2.3 Plotting Daily Inspection Activity 
+## 2.3 Plotting Accelerometer Daily Activity Count
+
+We can apply the `ggplot` function to generate a single-panel plot depicting the 24-hour activity time courses for each of the 35 days of observation. In the scatter plot below, each day of the week is delineated through different colors. 
 
 ```{r}
 accelerometer_data %>% 
@@ -104,7 +106,7 @@ accelerometer_data %>%
     legend.position = "bottom", 
     plot.title = element_text(hjust = 0.5)) +
   labs(
-    title = "Plot of Daily Inspection Activity", 
+    title = "Plot of Accelerometer Daily Activity Count", 
     x = "Activity Time (Minute of Day)", 
     y = "Activity Count",
     color = "Day of Week") 
