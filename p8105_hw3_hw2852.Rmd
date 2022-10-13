@@ -79,7 +79,7 @@ accelerometer_data =
     values_to = "activity_count")
 ```
 
-***Data description 
+*** Data description 
 
 ## 2.2 Total Daily Activity
 
@@ -91,5 +91,27 @@ accelerometer_data %>%
   summarise(total_daily_activity = sum(activity_count)) %>% 
   print(n = 35)
 ```
+
+*** Data description
+
+## 2.3 Plotting Daily Inspection Activity 
+
+```{r}
+accelerometer_data %>% 
+  ggplot(aes(x = activity_time, y = activity_count, color = day)) +
+  geom_point() +
+  theme(
+    legend.position = "bottom", 
+    plot.title = element_text(hjust = 0.5)) +
+  labs(
+    title = "Plot of Daily Inspection Activity", 
+    x = "Activity Time (Minute of Day)", 
+    y = "Activity Count",
+    color = "Day of Week") 
+```
+
+
+
+
 
 
