@@ -58,3 +58,14 @@ instacart %>%
   labs(title = "Plot of Aisle by Numbers of Items Sold", x = "Aisle ID", y = "Number of Items Ordered")
 ```
 
+# Problem 2
+
+## 2.1 Accelerometer Data: Read, Tidy, Wrangle
+
+```{r}
+accelerometer = 
+  read_csv("./accel_data.csv") %>% 
+  janitor::clean_names(.)
+```
+
+
