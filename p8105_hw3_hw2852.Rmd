@@ -9,6 +9,8 @@ In preparation for the problems below, we will load the following libraries:
 
 ```{r load_libraries}
 library(tidyverse)
+library(readxl)
+library(dplyr)
 ```
 
 # Problem 1
@@ -62,10 +64,22 @@ instacart %>%
 
 ## 2.1 Accelerometer Data: Read, Tidy, Wrangle
 
+We will begin by importing and cleaning the CSV file containing this patient's accelerometer data. This process involves data import, cleaning variable names, and applying the `pivot_longer` function to convert the data from wide to long format. A new `weekend_vs_weekday` variable was generated to indicate whether the entry corresponds to a weekend or a weekday.
+
 ```{r}
-accelerometer = 
+accelerometer_data = 
   read_csv("./accel_data.csv") %>% 
-  janitor::clean_names(.)
+  janitor::clean_names(.) %>% 
+  mutate(weekend_vs_weekday = if_else(day != "Saturday" & day != "Sunday","weekday", "weekend")) %>% 
+  pivot_longer(
+    activity_1:activity_1440, 
+    names_to = "activity_time", 
+    names_prefix = "activity_",
+    names_transform = list(activity_time = as.integer),
+    values_to = "activity_count")
 ```
+
+***Data description 
+
 
 
