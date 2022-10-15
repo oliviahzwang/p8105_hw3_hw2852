@@ -96,12 +96,12 @@ accelerometer_data %>%
 
 ## 2.3 Plotting Accelerometer Daily Activity Count
 
-We can apply the `ggplot` function to generate a single-panel plot depicting the 24-hour activity time courses for each of the 35 days of observation. In the scatter plot below, each day of the week is delineated through different colors. 
+We can apply the `ggplot` function to generate a single-panel plot depicting the 24-hour activity time courses for each of the 35 days of observation. In the line graph below, each day of observation's accelerometer activity count data is plotted against the corresponding minute of the day at which the reading was recorded, with the different colors delineating the day of the week. 
 
 ```{r}
 accelerometer_data %>% 
   ggplot(aes(x = activity_time, y = activity_count, color = day)) +
-  geom_point() +
+  geom_line(aes(group = day_id)) +
   theme(
     legend.position = "bottom", 
     plot.title = element_text(hjust = 0.5)) +
@@ -112,8 +112,34 @@ accelerometer_data %>%
     color = "Day of Week") 
 ```
 
+*** Data description
+
+# Problem 3
+
+This problem uses `NY NOAA` data. This data set will be loaded through the `p8105.datasets` library. 
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
 
 
+## 3.1 NY NOAA Data: Tidying Data
 
+We will first tidy the `ny_noaa` data set. This process involves cleaning variable names, creating new `year`, `month` and `day` variables from the existing `date` variable, and mutating year, month, date, precipitation, maximum and minimum temperature variables to appropriate (i.e., numeric) units). 
+
+```{r}
+ny_noaa_data = ny_noaa %>% 
+  janitor::clean_names() %>% 
+  separate(col = date, into = c('year', 'month','day'), sep = '-') %>%
+  mutate(
+    year = as.numeric(year),
+    month = as.numeric(month),
+    day = as.numeric(day),
+    prcp = prcp/10, 
+    tmax = as.numeric(tmax) / 10,
+    tmin = as.numeric(tmin) / 10
+  )
+```
 
 
