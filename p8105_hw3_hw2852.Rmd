@@ -160,10 +160,21 @@ To generate a 2-panel plot depicting the average maximum temperature in January 
 ny_noaa_data %>%
   select(id, year, month, day, tmax) %>% 
   filter(month == 1 | month == 7) %>% 
+  mutate(month = recode(month, 
+                        '1' = 'January', 
+                        '7' = 'July')) %>% 
   ggplot(aes(x = year, y = tmax)) +
-  geom_point(alpha = 0.05) +
-  geom_smooth(se = FALSE) +
-  facet_grid(~month)
+  geom_point(aes(color = tmax), alpha = 0.05) +
+  geom_smooth(se = FALSE, color = "yellow") +
+  facet_grid(~month) +
+  labs(
+    title = "Maximum Temperatures in January vs. July (1981-2010)",
+    x = "Year", 
+    y = "Maximum Temperature (C)") +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5))
+    
 ```
 
 
