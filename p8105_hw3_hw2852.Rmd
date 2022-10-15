@@ -144,13 +144,26 @@ ny_noaa_data = ny_noaa %>%
 
 ## 3.2 Snowfall 
 
-Using the tidied `ny_noaa_data` data set, we can determine the most commonly observed values of snowfall by first grouping the observations by `snow`, then summarising the number of observations for each `snow` value, and arranging the output in descending order. 
+Using the tidied `ny_noaa_data` data set, we can determine the most commonly observed values of snowfall by first grouping the observations by `snow`, then summarizing the number of observations for each `snow` value, and arranging the output in descending order. 
 
 ```{r}
 ny_noaa_data %>% 
   group_by(snow) %>% 
   summarise(snowfall_n_obs = n()) %>% 
   arrange(desc(snowfall_n_obs))
+```
+## 3.3 Plotting Maximum Temperatures in January & July
+
+To generate a 2-panel plot depicting the average maximum temperature in January and July in each station across years we must first generate a 
+
+```{r}
+ny_noaa_data %>%
+  select(id, year, month, day, tmax) %>% 
+  filter(month == 1 | month == 7) %>% 
+  ggplot(aes(x = year, y = tmax)) +
+  geom_point(alpha = 0.05) +
+  geom_smooth(se = FALSE) +
+  facet_grid(~month)
 ```
 
 
