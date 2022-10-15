@@ -142,4 +142,16 @@ ny_noaa_data = ny_noaa %>%
   )
 ```
 
+## 3.2 Snowfall 
+
+Using the tidied `ny_noaa_data` data set, we can determine the most commonly observed values of snowfall by first grouping the observations by `snow`, then summarising the number of observations for each `snow` value, and arranging the output in descending order. 
+
+```{r}
+ny_noaa_data %>% 
+  group_by(snow) %>% 
+  summarise(snowfall_n_obs = n()) %>% 
+  arrange(desc(snowfall_n_obs))
+```
+
+
 
