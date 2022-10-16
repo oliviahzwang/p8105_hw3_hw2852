@@ -19,11 +19,8 @@ library(patchwork)
 This problem uses the `Instacart` data. This data set will be loaded through the `p8105.datasets` library. 
 
 ```{r}
+library(p8105.datasets)
 data("instacart")
-
-instacart = 
-  instacart %>% 
-  as_tibble(instacart)
 ```
 
 ## 1.1 Description of `Instacart` Data 
@@ -73,6 +70,7 @@ instacart %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1), 
         plot.title = element_text(hjust = 0.5))
 ```
+
 ### Top 3 Most Popular Items per Aisle
 
 The following table identifies the top 3 most popular items in the `baking ingredients`, `dog food care` and `packaged vegetables fruits` aisles, and enumerates the times each item is ordered. 
@@ -121,8 +119,7 @@ accelerometer_data =
     names_transform = list(activity_time = as.integer),
     values_to = "activity_count")
 ```
-
-*** Data description 
+The tidied `accelerometer_data` data set contains __`r nrow(accelerometer_data)` rows__ and __`r ncol(accelerometer_data)` columns__. Each row in the data set corresponds to a single reading of accelerometer activity. The variables in the data set include identifiers of the week, day, and minute of the day at which the accelerometer activity count is recorded. The newly created `weekend_vs_weekday` variable also identifies whether the reading corresponds to a weekend or a weekday. Accelerometer activity count data is collected on __`r accelerometer_data %>% select(day_id) %>% distinct %>% count` days__ over __`r accelerometer_data %>% select(week) %>% distinct %>% count` weeks__. 
 
 ## 2.2 Total Daily Activity
 
