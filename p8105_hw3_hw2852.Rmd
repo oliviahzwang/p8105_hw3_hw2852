@@ -11,6 +11,7 @@ In preparation for the problems below, we will load the following libraries:
 library(tidyverse)
 library(readxl)
 library(dplyr)
+library(patchwork)
 ```
 
 # Problem 1
@@ -18,16 +19,22 @@ library(dplyr)
 This problem uses the `Instacart` data. This data set will be loaded through the `p8105.datasets` library. 
 
 ```{r}
-library(p8105.datasets)
 data("instacart")
+
+instacart = 
+  instacart %>% 
+  as_tibble(instacart)
 ```
 
 ## 1.1 Description of `Instacart` Data 
 
+The `instacart` data set contains __`r nrow(instacart)` rows__ and __`r ncol(instacart)` columns__. Each row in the data set corresponds to a single item of an Instacart order. The variables in the data set include ID numbers corresponding to orders, products, and Instacart users, as well as the order in which a particular product was added to cart. The data set contains a number of order-level variables that describe the date and time an order was made, and the number of days since a previous order was made. There are also several item-specific variables that describe the product name, department to which the product belongs, the aisle in which the product can be found, and relevant order history. 
+
+There are __`r instacart %>% select(product_id) %>% distinct %>% count` products__ found in __`r instacart %>% select(user_id, order_id) %>% distinct %>% count` orders__ from __`r instacart %>% select(user_id) %>% distinct %>% count` distinct users__.
 
 ## 1.2 Analysis of `Instacart` Data
 
-### Aisles
+### Enumerating Total Aisles
 
 We can enumerate the number of aisles by applying the `group_by` function to identify the number of unique `aisle_id` variable values. The number of rows generated in the output would be the number of aisles in the data set. Building upon the results generated from the `group_by` function, we may determine the aisles from which the most items were ordered. This process involves generating a summary of the number of times each `aisle_id` appears in these data, then arranging the aisles in decreasing order of the number of times it appears. 
 
@@ -50,15 +57,51 @@ __21__         41,699
 
 ### Plotting Aisle vs. Items Ordered
 
+Using the `instacart` data set, we can generate a plot showing the number of items ordered in each aisle, limiting this to aisles with more than 10,000 items ordered. This process involves counting the number of distinct aisles and filtering the data to only include aisles in which more than 10,000 items are ordered. We can then generate a scatter plot using `ggplot`, with the aisles arranged in increasing order of number of items ordered. 
+
 ```{r}
 instacart %>% 
-  group_by(aisle_id) %>% 
-  mutate(items_ordered = n()) %>% 
-  filter(items_ordered > 10000) %>% 
-  ggplot(aes(x = aisle_id)) + 
-  geom_histogram(color = "black", fill = "lightblue") + 
-  labs(title = "Plot of Aisle by Numbers of Items Sold", x = "Aisle ID", y = "Number of Items Ordered")
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  mutate(aisle = fct_reorder(aisle, n)) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point() + 
+  labs(
+    title = "Number of Items Ordered per Aisle", 
+    x = "Aisle", 
+    y = "Number of Items Ordered (n)") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1), 
+        plot.title = element_text(hjust = 0.5))
 ```
+### Top 3 Most Popular Items per Aisle
+
+The following table identifies the top 3 most popular items in the `baking ingredients`, `dog food care` and `packaged vegetables fruits` aisles, and enumerates the times each item is ordered. 
+
+```{r}
+instacart %>% 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>%
+  group_by(aisle) %>% 
+  count(product_name) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 4) %>% 
+  arrange(desc(n)) %>%
+  knitr::kable()
+```
+
+### Mean Hour of Purchases: Pink Lady Apples & Coffe Ice Cream
+
+This final table displays the mean hour of the day at which the Pink Lady Applies and Coffee Ice Cream products are ordered each day of the week.
+
+```{r}
+instacart %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  group_by(product_name, order_dow) %>%
+  summarize(mean_hour = mean(order_hour_of_day)) %>%
+  spread(key = order_dow, value = mean_hour) %>%
+  knitr::kable(digits = 2)
+```
+
+Based on the table generated above, we can conclude that Pink Lady Apples are usually purchased earlier in the day than Coffee Ice Cream, with the exception of Day 5. 
 
 # Problem 2
 
@@ -154,7 +197,7 @@ ny_noaa_data %>%
 ```
 ## 3.3 Plotting Maximum Temperatures in January & July
 
-To generate a 2-panel plot depicting the average maximum temperature in January and July in each station across years we must first generate a 
+To generate a 2-panel plot depicting the average maximum temperature in January and July in each station across years. 
 
 ```{r}
 ny_noaa_data %>%
@@ -164,18 +207,62 @@ ny_noaa_data %>%
                         '1' = 'January', 
                         '7' = 'July')) %>% 
   ggplot(aes(x = year, y = tmax)) +
-  geom_point(aes(color = tmax), alpha = 0.05) +
+  geom_point(aes(color = tmax)) +
   geom_smooth(se = FALSE, color = "yellow") +
   facet_grid(~month) +
   labs(
     title = "Maximum Temperatures in January vs. July (1981-2010)",
     x = "Year", 
-    y = "Maximum Temperature (C)") +
+    y = "Maximum Temperature (C)", 
+    color = "Temperature (C)") +
   theme(
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5))
-    
+    plot.title = element_text(hjust = 0.5),
+    strip.text = element_text(face = "bold"))
 ```
 
+## 3.4 Plotting Maximum and Minimum Temperatures & Distribution of Snowfall
+
+```{r}
+tmax_vs_tmin_p = 
+ny_noaa_data %>% 
+  select(tmax,tmin) %>% 
+  drop_na(tmax, tmin) %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "temp_observation", 
+    values_to = "temp_measurement") %>%
+  mutate(temp_observation = recode(temp_observation, 
+                                   'tmax' = "Max Temperature",
+                                   'tmin' = "Min Temperature")) %>% 
+  ggplot(aes(x = temp_measurement, fill = temp_observation)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "Maximum & Minimum Temperatures",
+    x = "Temperature (C)", 
+    y = "Density", 
+    fill = "Observation") +
+   theme(
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5))
+
+dist_snowfall_plot = 
+  ny_noaa_data %>% 
+  filter(0 < snow & snow < 100) %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = snow, y = year, group = year, fill = year)) + 
+  ggridges::geom_density_ridges() + 
+  viridis::scale_fill_viridis() +
+  labs(
+    title = "Distribution of Snowfall",
+    x = "Snowfall (mm)", 
+    y = "Density", 
+    fill = "year") +
+   theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5))   
+
+tmax_vs_tmin_p + dist_snowfall_plot
+
+```
 
 
