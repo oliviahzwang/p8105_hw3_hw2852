@@ -270,7 +270,7 @@ dist_snowfall_plot =
   labs(
     title = "Distribution of Snowfall",
     x = "Snowfall (mm)", 
-    y = "Density", 
+    y = "Year", 
     fill = "year") +
    theme(
     legend.position = "none",
