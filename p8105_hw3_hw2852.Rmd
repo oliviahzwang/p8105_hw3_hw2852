@@ -128,11 +128,14 @@ Using the tidied accelerometer data generated in Part 2.1, we can aggregate acro
 ```{r}
 accelerometer_data %>% 
   group_by(day_id) %>% 
-  summarise(total_daily_activity = sum(activity_count)) %>% 
-  print(n = 35)
+  mutate(total_daily_activity = sum(activity_count)) %>% 
+  summarise(day, total_daily_activity) %>% 
+  distinct %>% 
+  print(n = 35) %>% 
+  knitr::kable()
 ```
 
-*** Data description
+It is difficult to identify any apparent trend through the tabulated data alone. Based on a cursory glance, we can see that on days 24 and 31, both of which are Saturdays, the accelerometer activity count at every minute of the day were 1, thus aggregating to a total of 1440 over 24 hours for both those days. To more effectively identify trends in these data, it would be helpful to generate a scatter or line plot to view how the accelerometer activity count data varies over time. 
 
 ## 2.3 Plotting Accelerometer Daily Activity Count
 
