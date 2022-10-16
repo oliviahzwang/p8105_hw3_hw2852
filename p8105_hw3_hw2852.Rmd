@@ -149,7 +149,7 @@ accelerometer_data %>%
     legend.position = "bottom", 
     plot.title = element_text(hjust = 0.5)) +
   labs(
-    title = "Plot of Accelerometer Daily Activity Count", 
+    title = "Daily Accelerometer Activity Count", 
     x = "Activity Time (Minute of Day)", 
     y = "Activity Count",
     color = "Day of Week") 
@@ -164,8 +164,12 @@ This problem uses `NY NOAA` data. This data set will be loaded through the `p810
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
+skimr::skim(ny_noaa)
 ```
 
+The untidied `ny_noaa` data set contains __`r nrow(ny_noaa)` rows__ and __`r ncol(ny_noaa)` columns__. Each row in the data set includes the snowfall, snow depth, maximum and minimum temperature readings corresponding to a specific weather station on a specific date. 
+
+There is no missing data for the `id` and `date` variables. Based on the data summary generated above, there are over 1 million missing values for each of maximum and minimum temperature variables. In other words, temperature measures are missing for approximately half of the entries. Due to the significant amount of missing temperature data, further analyses conducted with temperature data may generate invalid conclusions. There is also missing data for the precipitation, snowfall and snow depth variables; however, each are missing significantly fewer entries compared to the number of missing temperature measures, namely `r sum(is.na(ny_noaa$prcp))` missing values for precipitation, `r sum(is.na(ny_noaa$snow))` missing values for snowfall, and `r sum(is.na(ny_noaa$snwd))` missing values for snow depth. Missing values of precipitation, snowfall and snow depth pose significantly lesser issues for data analysis, since they account for a lower percentage of total entries. 
 
 ## 3.1 NY NOAA Data: Tidying Data
 
@@ -193,34 +197,45 @@ Using the tidied `ny_noaa_data` data set, we can determine the most commonly obs
 ny_noaa_data %>% 
   group_by(snow) %>% 
   summarise(snowfall_n_obs = n()) %>% 
-  arrange(desc(snowfall_n_obs))
+  arrange(desc(snowfall_n_obs)) %>% 
+  knitr::kable() 
 ```
+
+The most commonly observed values for snowfall are 0mm, NA, 25mm, 13mm and 51mm. It is not surprising that 0mm is the most commonly observed value for snowfall, since New York usually does not have snow for most of the year: New York usually only expects snow during the months of December through February. The missing values (NA) generated in the table above are consistent with the number of missing values identified in the previously generated data summary. The subsequently most commonly observed values of 25mm, 13mm and 51mm. These measures are consistent with the fact that New York typically does not have a lot of snowfall during the winter seasons.
+
 ## 3.3 Plotting Maximum Temperatures in January & July
 
-To generate a 2-panel plot depicting the average maximum temperature in January and July in each station across years. 
+Using the tidied `ny_noaa_data` data set, we can generate a 2-panel plot depicting the average maximum temperatures in January and July at each weather station across years. 
 
 ```{r}
 ny_noaa_data %>%
   select(id, year, month, day, tmax) %>% 
+  drop_na(tmax) %>% 
   filter(month == 1 | month == 7) %>% 
+  group_by(year, month, id) %>% 
   mutate(month = recode(month, 
                         '1' = 'January', 
-                        '7' = 'July')) %>% 
-  ggplot(aes(x = year, y = tmax)) +
+                        '7' = 'July'),
+         mean_tmax = mean(tmax)) %>% 
+  ggplot(aes(x = year, y = mean_tmax)) +
   geom_point(aes(color = tmax)) +
   geom_smooth(se = FALSE, color = "yellow") +
   facet_grid(~month) +
   labs(
-    title = "Maximum Temperatures in January vs. July (1981-2010)",
+    title = "Average Maximum Temperatures in January vs. July (1981-2010)",
     x = "Year", 
-    y = "Maximum Temperature (C)", 
+    y = "Average Maximum Temperature (C)", 
     color = "Temperature (C)") +
   theme(
     plot.title = element_text(hjust = 0.5),
     strip.text = element_text(face = "bold"))
 ```
 
+As expected, the average maximum temperatures in January, a winter month, are consistently lower than the average maximum temperatures in July, a summer month. The variance in average maximum temperatures in January is greater than that of the average maximum temperatures in July. This is consistent with what we generally understand of January as more of a transition month, where the weather is slowly, but surely, transitioning from winter to spring. here are a few outliers in both January and July, most of which are usually colder than average temperatures; however, none are particularly alarming, or would raise concerns about potential measurement error. 
+
 ## 3.4 Plotting Maximum and Minimum Temperatures & Distribution of Snowfall
+
+Finally, we can generate another 2-panel plot showing (i) the density of maximum and minimum temperatures for the full dataset; and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year.  
 
 ```{r}
 tmax_vs_tmin_p = 
@@ -262,7 +277,4 @@ dist_snowfall_plot =
     plot.title = element_text(hjust = 0.5))   
 
 tmax_vs_tmin_p + dist_snowfall_plot
-
 ```
-
-
