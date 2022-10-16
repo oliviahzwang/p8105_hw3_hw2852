@@ -155,7 +155,7 @@ accelerometer_data %>%
     color = "Day of Week") 
 ```
 
-*** Data description
+Based on the line plot generated above, we can see that activity counts are lower during hours of the day at which the patient under observation is likely asleep. More specifically, between the hours of around 9:30pm (minute 1300) to 4:00am (minute 250), accelerometer activity count are consistently lower than during other times of the day, and there are also fewer outlying jumps in activity count during those times. Furthermore, these data also show increased average accelerometer activity counts during the hours of around 7:00pm (minute 1170) to 10:30pm (minute 1350). There does not seem to be a specific day of the week during which sudden increases in activity count is more frequent. The main trends observable in these data are mainly with respect to the time of day during which increases or decreases of activity count are apparent. 
 
 # Problem 3
 
